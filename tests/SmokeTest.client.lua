@@ -1,0 +1,17 @@
+-- Run manually as a LocalScript in a test place, not alongside Example.
+local UI=require(game:GetService("ReplicatedStorage"):WaitForChild("DulcanUI"))
+local w=UI:CreateWindow({Name="DulcanUISmokeTest",StatusBar=false})
+local s=w:CreateTab({Title="Test",Columns=2}):CreateSection("Controls",1)
+local calls=0
+local t=s:AddToggle({Title="Toggle",Id="toggle",Default=true,Callback=function() calls+=1 end})
+local n=s:AddSlider({Title="Slider",Id="number",Min=0,Max=100,Step=5,Default=15})
+local d=s:AddDropdown({Title="Dropdown",Id="dropdown",Options={"A","B"},Default="B"})
+local i=s:AddInput({Title="Input",Id="text",Default="hello"})
+assert(t:Get()==true and calls==0); t:Set(false); assert(calls==1 and t:Get()==false)
+n:Set(17); assert(n:Get()==15); n:Set(200); assert(n:Get()==100)
+assert(d:Set("invalid")==false and d:Get()=="B")
+local json=w:ExportConfig(); i:Set("changed"); n:Set(0); assert(w:ImportConfig(json)); assert(i:Get()=="hello" and n:Get()==100)
+assert(w:ImportConfig("invalid")==false)
+w:SetTheme("Blue"); assert(w.ThemeName=="Blue"); w:SetTransparency(.3); assert(math.abs(w.Main.BackgroundTransparency-.3)<.001)
+w:Destroy(); assert(not w.Alive and #w.Connections==0)
+print("[DulcanUI] smoke test passed")
